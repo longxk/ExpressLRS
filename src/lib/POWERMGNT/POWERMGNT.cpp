@@ -2,7 +2,11 @@
 #include "../../src/targets.h"
 
 #if defined(Regulatory_Domain_AU_915) || defined(Regulatory_Domain_EU_868) || defined(Regulatory_Domain_FCC_915) || defined(Regulatory_Domain_AU_433) || defined(Regulatory_Domain_EU_433)
+#ifdef TARGET_SX126X
+extern SX126xDriver Radio;
+#elif
 extern SX127xDriver Radio;
+#endif
 #elif Regulatory_Domain_ISM_2400
 extern SX1280Driver Radio;
 #endif

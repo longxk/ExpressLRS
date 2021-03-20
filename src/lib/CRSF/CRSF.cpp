@@ -318,7 +318,7 @@ void ICACHE_RAM_ATTR CRSF::sendSyncPacketToTX(void *pvParameters) // in values i
 
 #endif
 
-#if defined(PLATFORM_ESP8266) || defined(TARGET_R9M_RX) || defined(UNIT_TEST)
+#if defined(PLATFORM_ESP8266) || defined(TARGET_R9M_RX) || defined(PLATFORM_ASR6501) || defined(UNIT_TEST)
         bool CRSF::RXhandleUARTout()
         {
             uint8_t peekVal = SerialOutFIFO.peek(); // check if we have data in the output FIFO that needs to be written
@@ -352,8 +352,8 @@ void ICACHE_RAM_ATTR CRSF::sendSyncPacketToTX(void *pvParameters) // in values i
 
             outBuffer[LinkStatisticsFrameLength + 3] = crc;
 #ifndef DEBUG_CRSF_NO_OUTPUT
-            SerialOutFIFO.push(LinkStatisticsFrameLength + 4);
-            SerialOutFIFO.pushBytes(outBuffer, LinkStatisticsFrameLength + 4);
+            //SerialOutFIFO.push(LinkStatisticsFrameLength + 4);
+            //SerialOutFIFO.pushBytes(outBuffer, LinkStatisticsFrameLength + 4);
             //this->_dev->write(outBuffer, LinkStatisticsFrameLength + 4);
 #endif
         }

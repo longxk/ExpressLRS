@@ -5,8 +5,13 @@
 #include "LowPassFilter.h"
 
 #if defined(Regulatory_Domain_AU_915) || defined(Regulatory_Domain_EU_868) || defined(Regulatory_Domain_FCC_915) || defined(Regulatory_Domain_AU_433) || defined(Regulatory_Domain_EU_433)
+#ifdef TARGET_SX126X
+#include "SX126xDriver.h"
+SX126xDriver Radio;
+#elif
 #include "SX127xDriver.h"
 SX127xDriver Radio;
+#endif
 #elif Regulatory_Domain_ISM_2400
 #include "SX1280Driver.h"
 SX1280Driver Radio;
@@ -37,7 +42,7 @@ SX1280Driver Radio;
 #define SEND_LINK_STATS_TO_FC_INTERVAL 100
 ///////////////////
 
-#define DEBUG_SUPPRESS // supresses debug messages on uart
+//#define DEBUG_SUPPRESS // supresses debug messages on uart
 
 hwTimer hwTimer;
 
@@ -500,7 +505,7 @@ void ICACHE_RAM_ATTR ProcessRFPacket()
 
     if ((alreadyFHSS == false) || (ExpressLRS_currAirRate_Modparams->index > 2))
     {
-        #if !(defined(TARGET_TX_ESP32_E28_SX1280_V1) || defined(TARGET_TX_ESP32_SX1280_V1) || defined(TARGET_RX_ESP8266_SX1280_V1) || defined(Regulatory_Domain_ISM_2400))
+        #if !(defined(TARGET_TX_ESP32_E28_SX1280_V1) || defined(TARGET_TX_ESP32_SX1280_V1) || defined(TARGET_RX_ESP8266_SX1280_V1) || defined(Regulatory_Domain_ISM_2400) || defined(TARGET_SX126X))
         HandleFreqCorr(Radio.GetFrequencyErrorbool()); //corrects for RX freq offset
         Radio.SetPPMoffsetReg(FreqCorrection);         //as above but corrects a different PPM offset based on freq error
         #endif
@@ -521,7 +526,7 @@ void ICACHE_RAM_ATTR ProcessRFPacket()
 
 void beginWebsever()
 {
-#ifdef PLATFORM_STM32
+#if defined(PLATFORM_STM32) || defined(PLATFORM_ASR6501)
 #else
     hwTimer.stop();
     BeginWebUpdate();
@@ -580,7 +585,7 @@ void ICACHE_RAM_ATTR TXdoneISR()
 
 void setup()
 {
-    delay(100);
+    delay(5000);
     Serial.println("ExpressLRS Module Booting...");
 
 #ifdef PLATFORM_STM32
@@ -622,7 +627,7 @@ void setup()
     FHSSrandomiseFHSSsequence();
 
     Radio.currFreq = GetInitialFreq();
-    #if !(defined(TARGET_TX_ESP32_E28_SX1280_V1) || defined(TARGET_TX_ESP32_SX1280_V1) || defined(TARGET_RX_ESP8266_SX1280_V1) || defined(Regulatory_Domain_ISM_2400))
+    #if !(defined(TARGET_TX_ESP32_E28_SX1280_V1) || defined(TARGET_TX_ESP32_SX1280_V1) || defined(TARGET_RX_ESP8266_SX1280_V1) || defined(Regulatory_Domain_ISM_2400) || defined(TARGET_SX126X))
     Radio.currSyncWord = UID[3];
     #endif
     bool init_success = Radio.Begin();
@@ -635,9 +640,13 @@ void setup()
     }
 #ifdef TARGET_RX_ESP8266_SX1280_V1
     Radio.SetOutputPower(13); //default is max power (12.5dBm for SX1280 RX)
-    #else
+#else
+#ifdef PLATFORM_ASR6501
+    Radio.SetOutputPower(22);
+#else
     Radio.SetOutputPower(0b1111); //default is max power (17dBm for SX127x RX@)
-    #endif
+#endif
+#endif
 
     // RFnoiseFloor = MeasureNoiseFloor(); //TODO move MeasureNoiseFloor to driver libs
     // Serial.print("RF noise floor: ");
@@ -739,7 +748,9 @@ void loop()
             LQCALC.reset();
             digitalWrite(GPIO_PIN_LED, LED);
             LED = !LED;
+            Serial.println();
             Serial.println(ExpressLRS_currAirRate_Modparams->interval);
+            Radio.GetStatus();
             scanIndex++;
             getRFlinkInfo();
             crsf.sendLinkStatisticsToFC();

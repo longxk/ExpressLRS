@@ -4,6 +4,17 @@
 
 #if defined(Regulatory_Domain_AU_915) || defined(Regulatory_Domain_EU_868) || defined(Regulatory_Domain_FCC_915) || defined(Regulatory_Domain_AU_433) || defined(Regulatory_Domain_EU_433)
 
+#ifdef TARGET_SX126X
+#include "SX126xDriver.h"
+//extern SX126xDriver Radio;
+
+expresslrs_mod_settings_s ExpressLRS_AirRateConfig[RATE_MAX] = {
+    {0, RATE_200HZ, SX126X_LORA_BW_500, SX126X_LORA_SF6, SX126X_LORA_CR_4_7, 5000, TLM_RATIO_1_64, 2, 8},
+    {1, RATE_100HZ, SX126X_LORA_BW_500, SX126X_LORA_SF7, SX126X_LORA_CR_4_7, 10000, TLM_RATIO_1_64, 2, 8},
+    {2, RATE_50HZ, SX126X_LORA_BW_500, SX126X_LORA_SF8, SX126X_LORA_CR_4_7, 20000, TLM_RATIO_NO_TLM, 2, 10},
+    {3, RATE_25HZ, SX126X_LORA_BW_500, SX126X_LORA_SF9, SX126X_LORA_CR_4_7, 40000, TLM_RATIO_NO_TLM, 2, 10}};
+    //{4, RATE_4HZ, SX126X_LORA_BW_500, SX126X_LORA_SF12, SX126X_LORA_CR_4_7, 250000, TLM_RATIO_1_4, 2, 10}}; // for model recovery
+#elif
 #include "SX127xDriver.h"
 extern SX127xDriver Radio;
 
@@ -13,7 +24,7 @@ expresslrs_mod_settings_s ExpressLRS_AirRateConfig[RATE_MAX] = {
     {2, RATE_50HZ, SX127x_BW_500_00_KHZ, SX127x_SF_8, SX127x_CR_4_7, 20000, TLM_RATIO_NO_TLM, 2, 10},
     {3, RATE_25HZ, SX127x_BW_500_00_KHZ, SX127x_SF_9, SX127x_CR_4_7, 40000, TLM_RATIO_NO_TLM, 2, 10}};
     //{4, RATE_4HZ, SX127x_BW_500_00_KHZ, SX127x_SF_12, SX127x_CR_4_7, 250000, TLM_RATIO_1_4, 2, 10}}; // for model recovery
-
+#endif
 expresslrs_rf_pref_params_s ExpressLRS_AirRateRFperf[RATE_MAX] = {
     {0, RATE_200HZ, -112, 4380, 3500, 2000, 2000, 5000}, // ~ 3 sync packets
     {1, RATE_100HZ, -117, 8770, 3500, 4000, 2000, 5000},

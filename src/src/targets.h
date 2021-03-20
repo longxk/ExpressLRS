@@ -7,7 +7,7 @@
 
 #define WORD_ALIGNED_ATTR __attribute__((aligned(4)))
 
-#ifdef PLATFORM_STM32
+#if defined(PLATFORM_STM32) || defined(PLATFORM_ASR6501)
 #define ICACHE_RAM_ATTR //nothing//
 #else
 #ifndef ICACHE_RAM_ATTR //fix to allow both esp32 and esp8266 to use ICACHE_RAM_ATTR for mapping to IRAM
@@ -248,4 +248,20 @@ https://github.com/jaxxzer
 #define GPIO_PIN_OLED_SCK -1
 #define GPIO_PIN_RCSIGNAL_RX 13
 #define GPIO_PIN_RCSIGNAL_TX 13
+#endif
+
+#ifdef TARGET_RX_CUBECELL
+#define GPIO_PIN_NSS P4_3
+#define GPIO_PIN_BUSY P4_7
+#define GPIO_PIN_DIO0 -1 // does not exist on sx1280
+#define GPIO_PIN_DIO1 P4_6
+#define GPIO_PIN_MOSI P4_0
+#define GPIO_PIN_MISO P4_1
+#define GPIO_PIN_SCK P4_2
+#define GPIO_PIN_RST P5_7
+#define GPIO_PIN_RCSIGNAL_RX -1 //only uses default uart pins so leave as -1 
+#define GPIO_PIN_RCSIGNAL_TX -1
+#define GPIO_PIN_LED -1
+#define GPIO_PIN_BUTTON -1
+#define timerOffset -1
 #endif

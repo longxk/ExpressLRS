@@ -18,7 +18,7 @@ Modified and adapted by Alessandro Carcione for ELRS project
 
 #include "SX1280_Regs.h"
 #include "SX1280_hal.h"
-#include <SPI.h>
+//#include <SPI.h>
 
 SX1280Hal *SX1280Hal::instance = NULL;
 

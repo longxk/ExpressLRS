@@ -1,14 +1,14 @@
 #pragma once
 
-#include <Arduino.h>
+#include <stdint.h>
 
 #include "../../src/targets.h"
-#include "SX1280_Regs.h"
-#include "SX1280_hal.h"
+#include "SX126x_Regs.h"
+#include "SX126x_hal.h"
 
 void ICACHE_RAM_ATTR TXnbISR();
 
-class SX1280Driver
+class SX126xDriver
 {
 
 public:
@@ -20,7 +20,6 @@ public:
 
     static void (*TXtimeout)(); //function pointer for callback
     static void (*RXtimeout)(); //function pointer for callback
-
     /////////////////////////////
 
     ///////////Radio Variables////////
@@ -31,11 +30,11 @@ public:
 
     static uint8_t _syncWord;
 
-    SX1280_RadioLoRaBandwidths_t currBW = SX1280_LORA_BW_0800;
-    SX1280_RadioLoRaSpreadingFactors_t currSF = SX1280_LORA_SF6;
-    SX1280_RadioLoRaCodingRates_t currCR = SX1280_LORA_CR_4_7;
-    uint32_t currFreq = 2400000000;
-    SX1280_RadioOperatingModes_t currOpmode = SX1280_MODE_SLEEP;
+    SX126x_RadioLoRaBandwidths_t currBW = SX126X_LORA_BW_125;
+    SX126x_RadioLoRaSpreadingFactors_t currSF = SX126X_LORA_SF7;
+    SX126x_RadioLoRaCodingRates_t currCR = SX126X_LORA_CR_4_5;
+    uint32_t currFreq = 0;
+    SX126x_RadioOperatingModes_t currOpmode = SX126X_MODE_SLEEP;
 
     // static uint8_t currPWR;
     // static uint8_t maxPWR;
@@ -61,16 +60,17 @@ public:
     static uint8_t CURR_REG_FIFO_ADDR_PTR;
 
     ////////////////Configuration Functions/////////////
-    SX1280Driver();
-    static SX1280Driver *instance;
+    SX126xDriver();
+    static SX126xDriver *instance;
     bool Begin();
     void End();
-    void SetMode(SX1280_RadioOperatingModes_t OPmode);
-    void Config(SX1280_RadioLoRaBandwidths_t bw, SX1280_RadioLoRaSpreadingFactors_t sf, SX1280_RadioLoRaCodingRates_t cr, uint32_t freq, uint8_t PreambleLength);
-    void ConfigModParams(SX1280_RadioLoRaBandwidths_t bw, SX1280_RadioLoRaSpreadingFactors_t sf, SX1280_RadioLoRaCodingRates_t cr);
-    void SetPacketParams(uint8_t PreambleLength, SX1280_RadioLoRaPacketLengthsModes_t HeaderType, uint8_t PayloadLength, SX1280_RadioLoRaCrcModes_t crc, SX1280_RadioLoRaIQModes_t InvertIQ);
+    void SetMode(SX126x_RadioOperatingModes_t OPmode);
+    void Config(SX126x_RadioLoRaBandwidths_t bw, SX126x_RadioLoRaSpreadingFactors_t sf, SX126x_RadioLoRaCodingRates_t cr, uint32_t freq, uint8_t PreambleLength);
+    void ConfigModParams(SX126x_RadioLoRaBandwidths_t bw, SX126x_RadioLoRaSpreadingFactors_t sf, SX126x_RadioLoRaCodingRates_t cr);
+    void SetPacketParams(uint8_t PreambleLength, SX126x_RadioLoRaPacketLengthsModes_t HeaderType, uint8_t PayloadLength, SX126x_RadioLoRaCrcModes_t crc, SX126x_RadioLoRaIQModes_t InvertIQ);
     void ICACHE_RAM_ATTR SetFrequency(uint32_t freq);
     void ICACHE_RAM_ATTR SetFIFOaddr(uint8_t txBaseAddr, uint8_t rxBaseAddr);
+    void SetPaConfig(uint8_t paDutyCycle, uint8_t HpMax, uint8_t deviceSel, uint8_t paLUT);
     void SetOutputPower(int8_t power);
 
     int32_t ICACHE_RAM_ATTR GetFrequencyError();
@@ -93,4 +93,6 @@ public:
     void ICACHE_RAM_ATTR GetLastPacketStats();
 
 private:
+
+    void ICACHE_RAM_ATTR CalibrateImage(uint32_t freq);
 };
